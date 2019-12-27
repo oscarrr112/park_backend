@@ -33,7 +33,7 @@ class NewView(View, CommonResponseMixin):
 
         park_lot = ParkLot(renter=User.objects.filter(phone_number=renter_id).first(), longitude=longitude,
                            latitude=latitude, detail_address=detail_address,
-                           rent_date=rent_date, description_tag=description_tag, rent_state=rent_state,
+                           rent_date=rent_date, rent_state=rent_state,
                            remark=remark, price=price)
         park_lot.save()
 
@@ -263,15 +263,20 @@ class GetInfoView(View, CommonResponseMixin):
         remark              备注
         """
 
+        description_pics = DescriptionPic.objects.filter(park_lot=park_lot)
         data = {
             'parking_lot_id': park_lot.park_lot_id,
             'renter_id': park_lot.renter_id,
+            'renter_name': park_lot.renter.nickname,
             'longitude': park_lot.longitude,
             'latitude': park_lot.latitude,
             'detail_address': park_lot.detail_address,
-            'rent_data': park_lot.rent_date,
+            'rent_date': park_lot.rent_date,
             'price': park_lot.price,
-            'remark': park_lot.remark
+            'remark': park_lot.remark,
+            'detail_word': park_lot.detail_word,
+            'photo_url': [pic.pic.url for pic in description_pics],
+            'rent_state': park_lot.rent_state
         }
 
         response = self.wrap_json_response(code=ReturnCode.SUCCESS, data=data)
