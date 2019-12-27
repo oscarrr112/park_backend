@@ -20,7 +20,6 @@ class NewView(View, CommonResponseMixin):
         latitude = request.POST.get('latitude')
         detail_address = request.POST.get('detail_address')
         rent_date = request.POST.get('rent_date')
-        description_tag = request.POST.get('description_tag')
         photos = request.FILES
         rent_state = request.POST.get('rent_state')
         remark = request.POST.get('remark')
@@ -88,7 +87,6 @@ class ListView(View, CommonResponseMixin):
                     'detail_address': park_lot.detail_address,
                     'rent_date': park_lot.rent_date,
                     'price': park_lot.price,
-                    'description_tag': park_lot.description_tag,
                     'detail_word': park_lot.detail_word,
                     'rent_state': park_lot.rent_state,
                     'remark': park_lot.remark,
@@ -118,7 +116,6 @@ class ListView(View, CommonResponseMixin):
                     'detail_address': park_lot.detail_address,
                     'rent_date': park_lot.rent_date,
                     'price': park_lot.price,
-                    'description_tag': park_lot.description_tag,
                     'detail_word': park_lot.detail_word,
                     'rent_state': park_lot.rent_state,
                     'remark': park_lot.remark,
@@ -156,17 +153,8 @@ class UserList(View, CommonResponseMixin):
             description_pics = DescriptionPic.objects.filter(park_lot=park_lot)
             data = {
                 'park_lot_id': park_lot.park_lot_id,
-                'renter': park_lot.renter.phone_number,
-                'renter_nickname': park_lot.renter.nickname,
-                'longitude': park_lot.longitude,
-                'latitude': park_lot.latitude,
                 'detail_address': park_lot.detail_address,
-                'rent_date': park_lot.rent_date,
-                'price': park_lot.price,
-                'description_tag': park_lot.description_tag,
-                'detail_word': park_lot.detail_word,
                 'rent_state': park_lot.rent_state,
-                'remark': park_lot.remark,
                 'photo_url': [pic.pic.url for pic in description_pics]
             }
             response.append(data)
