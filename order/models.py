@@ -19,3 +19,4 @@ class Order(models.Model):
     lessor = models.ForeignKey(User,  on_delete=models.CASCADE, related_name='lessor')
     tenant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tenant')
     park_lot = models.ForeignKey(ParkLot, on_delete=models.CASCADE)
+    tot_price = models.FloatField(blank=True, null=True)

@@ -5,10 +5,10 @@ from utils.respones import ReturnCode, CommonResponseMixin
 from utils import auth, uorder
 
 from order.models import Order
-from parking_lot.models import ParkLot
+from parking_lot.models import ParkLot, DescriptionPic
 from user.models import User
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 
 
@@ -149,6 +149,11 @@ class PayView(View, CommonResponseMixin):
 
         order.state = 3
         order.time_end = datetime.now()
+        time_start = order.time_start
+        time_end = order.time_end
+        delta_time = time_end - time_start
+
+        order.tot_price = order.price * delta_time.seconds / (60 * 60)
         order.save()
         tenant = order.tenant
         tenant.state = 0
@@ -195,9 +200,17 @@ class LessorListView(View, CommonResponseMixin):
     @auth.login_required
     @auth.id_cert_required
     def get(self, request):
-        phone_number = request.session.get('phone_number')
+        phone_number = request.GET.get('phone_number')
+        mode = request.GET.get('mode')
 
-        orders = Order.objects.filter(lessor_id=phone_number)
+        if not all([phone_number, mode]):
+            response = self.wrap_json_response(code=ReturnCode.BROKEN_PARAMS)
+            return JsonResponse(data=response, safe=False)
+
+        if mode == 4:
+            orders = Order.objects.filter(lessor_id=phone_number)
+        else:
+            orders = Order.objects.filter(lessor_id=phone_number, state=mode)
 
         response = []
         for order in orders:
@@ -214,6 +227,7 @@ class LessorListView(View, CommonResponseMixin):
                 'tenant_nickname': order.tenant.nickname,
                 'park_lot': order.park_lot_id,
                 'state': order.state,
+                'tot_price': order.tot_price
             }
             response.append(data)
 
@@ -225,29 +239,35 @@ class TenantListView(View, CommonResponseMixin):
     @auth.login_required
     @auth.id_cert_required
     def get(self, request):
-        phone_number = request.session.get('phone_number')
+        order_id = request.GET.get('order_id')
 
-        orders = Order.objects.filter(tenant_id=phone_number)
+        if order_id is None:
+            response = self.wrap_json_response(code=ReturnCode.INVALID_ORDER_ID)
+            return JsonResponse(data=response, safe=False)
 
-        response = []
-        for order in orders:
-            data = {
-                'order_id': order.order_id,
-                'time_start': order.time_start.strftime('%Y-%m-%d %H:%M') if order.time_start is not None else None,
-                'time_end': order.time_end.strftime('%Y-%m-%d %H:%M') if order.time_end is not None else None,
-                'book_time_start': order.book_time_start.strftime('%Y-%m-%d %H:%M'),
-                'book_time_end': order.book_time_end.strftime('%Y-%m-%d %H:%M'),
-                'price': order.price,
-                'lessor': order.lessor_id,
-                'lessor_nickname': order.lessor.nickname,
-                'tenant': order.tenant_id,
-                'tenant_nickname': order.tenant.nickname,
-                'park_lot': order.park_lot_id,
-                'state': order.state,
-            }
-            response.append(data)
+        try:
+            order = Order.objects.get(order_id=order_id)
+        except Order.DoesNotExist:
+            response = self.wrap_json_response(code=ReturnCode.INVALID_ORDER_ID)
+            return JsonResponse(data=response, safe=False)
 
-        response = self.wrap_json_response(data=response, code=ReturnCode.SUCCESS)
+        data = {
+            'order_id': order.order_id,
+            'time_start': order.time_start.strftime('%Y-%m-%d %H:%M') if order.time_start is not None else None,
+            'time_end': order.time_end.strftime('%Y-%m-%d %H:%M') if order.time_end is not None else None,
+            'book_time_start': order.book_time_start.strftime('%Y-%m-%d %H:%M'),
+            'book_time_end': order.book_time_end.strftime('%Y-%m-%d %H:%M'),
+            'price': order.price,
+            'lessor': order.lessor_id,
+            'lessor_nickname': order.lessor.nickname,
+            'tenant': order.tenant_id,
+            'tenant_nickname': order.tenant.nickname,
+            'park_lot': order.park_lot_id,
+            'state': order.state,
+            'tot_price': order.tot_price
+        }
+
+        response = self.wrap_json_response(data=data, code=ReturnCode.SUCCESS)
         return JsonResponse(data=response, safe=False)
 
 
@@ -257,6 +277,7 @@ class ParkLotListView(View, CommonResponseMixin):
     def get(self, request):
         park_lot = request.GET.get('park_lot_id')
         orders = Order.objects.filter(park_lot_id=park_lot)
+        pics = DescriptionPic.objects.filter(park_lot_id=park_lot)
 
         response = []
         for order in orders:
@@ -273,6 +294,8 @@ class ParkLotListView(View, CommonResponseMixin):
                 'tenant_nickname': order.tenant.nickname,
                 'park_lot': order.park_lot_id,
                 'state': order.state,
+                'image_url': [pic.pic.url for pic in pics],
+                'tot_price': order.tot_price
             }
             response.append(data)
 

@@ -87,10 +87,32 @@ DATABASES = {
     }
 }
 
+# redis配置
+# 缓存
+CACHES = {
+   "default": {  # 默认
+       "BACKEND": "django_redis.cache.RedisCache",
+       "LOCATION": "redis://127.0.0.1:6379/0",  # 可改：ip、port、db
+       "OPTIONS": {
+           "CLIENT_CLASS": "django_redis.client.DefaultClient",
+       }
+   },
+   "session": {  # session
+       "BACKEND": "django_redis.cache.RedisCache",
+       "LOCATION": "redis://127.0.0.1:6379/1",
+       "OPTIONS": {
+           "CLIENT_CLASS": "django_redis.client.DefaultClient",
+       }
+   },
+   "sms_code": {  # 手机验证码
+       "BACKEND": "django_redis.cache.RedisCache",
+       "LOCATION": "redis://127.0.0.1:6379/2",
+       "OPTIONS": {
+           "CLIENT_CLASS": "django_redis.client.DefaultClient",
+       }
+   },
+}
 
-# session的存储配置
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-SESSION_CACHE_ALIAS = 'session'
 
 # 设置session失效时间,单位为秒
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7
