@@ -68,88 +68,6 @@ class AuthorizeView(View, CommonResponseMixin):
             return JsonResponse(data=response, safe=False)
 
 
-class PhoneCertificationView(View, CommonResponseMixin):
-
-    def get(self, request):
-        """
-        获取短信验证码
-        :param request: web请求，phone_number 用户手机号
-        :return: JsonResponse data储存状态码，短信是否发送成功
-        """
-        # post_data = request.body.decode('utf-8')
-        # post_data = json.loads(post_data)
-        phone_number = request.GET.get('phone_number')
-        sms_code = get_redis_connection('sms_code')
-        redis_p = sms_code.pipeline()
-
-        if phone_number is None:
-            response = PhoneCertificationView.wrap_json_response(code=ReturnCode.BROKEN_PARAMS)
-            return JsonResponse(data=response, safe=False)
-
-        if sms_code.get(phone_number + '_flag') is not None:
-            response = PhoneCertificationView.wrap_json_response(code=ReturnCode.FREQUENTLY)
-            return JsonResponse(data=response, safe=False)
-
-        captcha = str(random.randint(10000, 100000 - 1))
-
-        redis_p.setex(phone_number, DUE, captcha)
-        redis_p.setex(phone_number + '_flag', INTERNAL, 1)
-        request.session['phone_number'] = phone_number
-        redis_p.execute()
-
-        data = auth.phone_cert(phone_number, captcha)
-        if data['result'] == -119:
-            response = PhoneCertificationView.wrap_json_response(code=ReturnCode.WRONG_PHONE_NUMBER)
-            return JsonResponse(data=response, safe=False)
-
-        response = PhoneCertificationView.wrap_json_response(data=captcha,
-                                                             code=ReturnCode.SUCCESS)
-        return JsonResponse(data=response, safe=False)
-
-    def post(self, request):
-        """
-        验证码的验证
-        :param request: web请求，captcha 用户填写的验证码
-        :return:
-        """
-        # post_data = request.body.decode('utf-8')
-        # post_data = json.loads(post_data)
-        #
-        # captcha_user = post_data.get('captcha')
-        captcha_user = request.POST.get('captcha')
-        sms_code = get_redis_connection('sms_code')
-
-        if captcha_user is None:
-            response = PhoneCertificationView.wrap_json_response(code=ReturnCode.BROKEN_PARAMS)
-            return JsonResponse(data=response, safe=False)
-
-        try:
-            phone_number = request.session['phone_number']
-        except KeyError:
-            response = PhoneCertificationView.wrap_json_response(code=ReturnCode.CAPTCHA_DUE)
-            return JsonResponse(data=response, safe=False)
-
-        captcha_correct = sms_code.get(phone_number)
-
-        if captcha_correct is None:
-            response = PhoneCertificationView.wrap_json_response(code=ReturnCode.CAPTCHA_DUE)
-            return JsonResponse(data=response, safe=False)
-
-        captcha_correct = captcha_correct.decode()
-        print("correct", captcha_correct)
-        print("user", captcha_user)
-
-        if captcha_correct == captcha_user:
-            user = User(phone_number=phone_number)
-            user.save()
-            response = PhoneCertificationView.wrap_json_response(code=ReturnCode.SUCCESS)
-            del request.session['phone_number']
-            return JsonResponse(data=response, safe=False)
-        else:
-            response = PhoneCertificationView.wrap_json_response(code=ReturnCode.WRONG_CAPTCHA)
-            return JsonResponse(data=response, safe=False)
-
-
 class IDCertificationView(View, CommonResponseMixin):
     def post(self, request):
 
@@ -200,48 +118,6 @@ class IDCertificationView(View, CommonResponseMixin):
 
         response = IDCertificationView.wrap_json_response(code=ReturnCode.SUCCESS)
         return JsonResponse(data=response, safe=False)
-
-
-class BankAccountView(View, CommonResponseMixin):
-
-    @auth.login_required
-    @auth.id_cert_required
-    def post(self, request):
-        """
-        验证用户银行卡
-        :param request:
-        :return:
-        """
-
-        name = request.POST.get('name')
-        id_num = request.POST.get('id')
-        bankcard = request.POST.get('bankcard')
-        phone_number = request.POST.get('phone_number')
-
-        data = auth.bank_account_cert(bankcard, id_num, phone_number, name)
-        code = data['status']
-        if code == '202' or code == '203':
-            response = BankAccountView.wrap_json_response(code=ReturnCode.FAILED)
-            return JsonResponse(response, safe=False)
-        elif code == '204':
-            response = BankAccountView.wrap_json_response(code=ReturnCode.WRONG_NAME)
-            return JsonResponse(response, safe=False)
-        elif code == '205':
-            response = BankAccountView.wrap_json_response(code=ReturnCode.WRONG_ID_NUMBER)
-            return JsonResponse(response, safe=False)
-        elif code == '206':
-            response = BankAccountView.wrap_json_response(code=ReturnCode.WRONG_CARD_NUMBER)
-            return JsonResponse(response, safe=False)
-        elif code == '207':
-            response = BankAccountView.wrap_json_response(code=ReturnCode.WRONG_PHONE_NUMBER)
-            return JsonResponse(response, safe=False)
-        else:
-            phone_number = request.session.get('phone_number')
-            user = User.objects.filter(phone_number=phone_number).first()
-            user.bankcard = bankcard
-            user.save()
-            response = BankAccountView.wrap_json_response(code=ReturnCode.SUCCESS)
-            return JsonResponse(data=response, safe=False)
 
 
 class RegisterView(View, CommonResponseMixin):

@@ -13,9 +13,7 @@ urlpatterns = [
     path('register', views.RegisterView.as_view()),
     path('login', views.AuthorizeView.as_view()),
     path('idcert', views.IDCertificationView.as_view()),
-    path('phonecert', views.PhoneCertificationView.as_view()),
     path('idcert', views.IDCertificationView.as_view()),
-    path('bankcardcert', views.BankAccountView.as_view()),
     path('usermanagement', views.UserManageView.as_view()),
     path('icon', views.IconView.as_view()),
     path('getinfo', views.GetInfoView.as_view())
