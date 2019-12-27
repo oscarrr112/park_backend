@@ -231,3 +231,48 @@ class ModifyList(View, CommonResponseMixin):
 
         response = NewView.wrap_json_response(code=ReturnCode.SUCCESS)
         return JsonResponse(data=response, safe=False)
+
+
+class GetInfoView(View, CommonResponseMixin):
+
+    @auth.login_required
+    @auth.id_cert_required
+    def get(self, request):
+        parking_lot_id = request.GET.get('parking_lot_id')
+
+        if parking_lot_id is None:
+            response = self.wrap_json_response(code=ReturnCode.BROKEN_PARAMS)
+            return JsonResponse(data=response, safe=False)
+
+        try:
+            park_lot = ParkLot.objects.get(park_lot_id=parking_lot_id)
+        except ParkLot.DoesNotExist:
+            response = self.wrap_json_response(code=ReturnCode.INVALID_PARK_LOT)
+            return JsonResponse(data=response)
+
+        """
+        park_lot_id         车位唯一id 主键
+        renter_id           出租人手机号码
+        longitude           车库经度
+        latitude            车库纬度
+        detail_address      详细地址
+        rent_date           出租日期
+        price               出租价格
+        detail_word         详细描述
+        rent_state          出租状态            -1:暂停出租，0:空闲中，1:预约中，2:出租中
+        remark              备注
+        """
+
+        data = {
+            'parking_lot_id': park_lot.park_lot_id,
+            'renter_id': park_lot.renter_id,
+            'longitude': park_lot.longitude,
+            'latitude': park_lot.latitude,
+            'detail_address': park_lot.detail_address,
+            'rent_data': park_lot.rent_date,
+            'price': park_lot.price,
+            'remark': park_lot.remark
+        }
+
+        response = self.wrap_json_response(code=ReturnCode.SUCCESS, data=data)
+        return JsonResponse(data=response, safe=False)

@@ -14,5 +14,6 @@ urlpatterns = [
     path('list', views.ListView.as_view()),
     path('userlist', views.UserList.as_view()),
     path('del', views.DelList.as_view()),
-    path('modify', views.ModifyList.as_view())
+    path('modify', views.ModifyList.as_view()),
+    path('getinfo', views.GetInfoView.as_view())
 ]
