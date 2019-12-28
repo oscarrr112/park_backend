@@ -18,7 +18,6 @@ import numpy as np
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -29,7 +28,6 @@ SECRET_KEY = '#g%=v_%gdp2r8)0ck7n=no1$x8zm7g!#$58szvpnid73=@n934'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -78,7 +76,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'park_backend.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
@@ -92,29 +89,28 @@ DATABASES = {
 # redis配置
 # 缓存
 CACHES = {
-   "default": {  # 默认
-       "BACKEND": "django_redis.cache.RedisCache",
-       "LOCATION": "redis://127.0.0.1:6379/0",  # 可改：ip、port、db
-       "OPTIONS": {
-           "CLIENT_CLASS": "django_redis.client.DefaultClient",
-       }
-   },
-   "session": {  # session
-       "BACKEND": "django_redis.cache.RedisCache",
-       "LOCATION": "redis://127.0.0.1:6379/1",
-       "OPTIONS": {
-           "CLIENT_CLASS": "django_redis.client.DefaultClient",
-       }
-   },
-   "sms_code": {  # 手机验证码
-       "BACKEND": "django_redis.cache.RedisCache",
-       "LOCATION": "redis://127.0.0.1:6379/2",
-       "OPTIONS": {
-           "CLIENT_CLASS": "django_redis.client.DefaultClient",
-       }
-   },
+    "default": {  # 默认
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/0",  # 可改：ip、port、db
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "session": {  # session
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "sms_code": {  # 手机验证码
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
 }
-
 
 # 设置session失效时间,单位为秒
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7
@@ -141,7 +137,6 @@ AUTH_PASSWORD_VALIDATORS = [
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -155,16 +150,25 @@ USE_L10N = True
 
 USE_TZ = False
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 
-
 # 默认头像
 default_icon = 'media/icon/timg.jpeg'
 default_md5 = hashlib.md5(np.array(Image.open(default_icon)))
 
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
+# CORS 设置跨域域名
+CORS_ORIGIN_WHITELIST = (
+    '127.0.0.1:8000',
+    'localhost:8000',
+    '114.55.255.62:8000'
+)
+
+CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
+
+# 前端需要携带cookies访问后端时,需要设置
+# withCredentials: true
