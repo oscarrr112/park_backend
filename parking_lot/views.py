@@ -236,8 +236,6 @@ class ModifyList(View, CommonResponseMixin):
 
 class GetInfoView(View, CommonResponseMixin):
 
-    @auth.login_required
-    @auth.id_cert_required
     def get(self, request):
         parking_lot_id = request.GET.get('parking_lot_id')
 
