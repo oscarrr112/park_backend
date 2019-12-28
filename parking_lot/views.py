@@ -89,7 +89,8 @@ class ListView(View, CommonResponseMixin):
                     'detail_word': park_lot.detail_word,
                     'rent_state': park_lot.rent_state,
                     'remark': park_lot.remark,
-                    'distance': geometry.get_distance_hav(park_lot.latitude, park_lot.longitude, latitude, longitude)
+                    'distance': geometry.get_distance_hav(park_lot.latitude, park_lot.longitude, latitude, longitude),
+                    'icon_url': park_lot.renter.icon.url
                 }
                 if order_mode == 2:
                     response = reversed(response)
