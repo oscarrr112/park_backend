@@ -77,6 +77,7 @@ class ListView(View, CommonResponseMixin):
 
             response = []
             for park_lot in park_lots:
+                description_pics = DescriptionPic.objects.filter(park_lot=park_lot)
                 response += {
                     'park_lot_id': park_lot.park_lot_id,
                     'renter': park_lot.renter.phone_number,
@@ -90,7 +91,8 @@ class ListView(View, CommonResponseMixin):
                     'rent_state': park_lot.rent_state,
                     'remark': park_lot.remark,
                     'distance': geometry.get_distance_hav(park_lot.latitude, park_lot.longitude, latitude, longitude),
-                    'icon_url': park_lot.renter.icon.url
+                    'icon_url': park_lot.renter.icon.url,
+                    'photo_url': [pic.pic.url for pic in description_pics],
                 }
                 if order_mode == 2:
                     response = reversed(response)
