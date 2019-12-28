@@ -69,10 +69,6 @@ class ListView(View, CommonResponseMixin):
             bindex = int(bindex)
             eindex = int(eindex)
 
-        if bindex < 0 or eindex >= ParkLot.objects.count():
-            response = ListView.wrap_json_response(code=ReturnCode.BAD_INDEX)
-            return JsonResponse(data=response, safe=False)
-
         max_latitude, min_latitude, min_longitude, max_longitude = geometry.delta(latitude, longitude, distance)
         park_lots = ParkLot.objects.filter(latitude__gte=min_latitude, latitude__lte=max_latitude,
                                            longitude__gte=min_longitude, longitude__lte=max_longitude)
@@ -103,6 +99,11 @@ class ListView(View, CommonResponseMixin):
             response = ListView.wrap_json_response(data=response, code=ReturnCode.SUCCESS)
             return JsonResponse(data=response, safe=False)
         else:
+
+            if bindex < 0 or eindex >= ParkLot.objects.count():
+                response = ListView.wrap_json_response(code=ReturnCode.BAD_INDEX)
+                return JsonResponse(data=response, safe=False)
+
             tmp = 1
             while park_lots.count() < eindex:
                 max_latitude, min_latitude, min_longitude, max_longitude \
