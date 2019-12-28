@@ -42,13 +42,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user',
     'parking_lot',
-    'order'
+    'order',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
     # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -164,3 +166,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 # 默认头像
 default_icon = 'media/icon/timg.jpeg'
 default_md5 = hashlib.md5(np.array(Image.open(default_icon)))
+
+CORS_ORIGIN_ALLOW_ALL = True
