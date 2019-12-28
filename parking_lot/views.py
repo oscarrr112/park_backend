@@ -128,7 +128,7 @@ class ListView(View, CommonResponseMixin):
                 }
                 response.append(data)
 
-            sorted(response, key=lambda x: x['distance'])
+            sorted(response, key=lambda x: x['price'])
             response = response[bindex: eindex + 1]
             if order_mode == 2:
                 response.reverse()
