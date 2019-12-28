@@ -121,7 +121,7 @@ class ListView(View, CommonResponseMixin):
                     'distance': geometry.get_distance_hav(park_lot.latitude, park_lot.longitude, latitude, longitude),
                     'photo_url': [pic.pic.url for pic in description_pics],
                     'nickname': park_lot.renter.nickname,
-                    'icon': park_lot.renter.icon
+                    'icon_url': park_lot.renter.icon.url
                 }
                 response.append(data)
 
