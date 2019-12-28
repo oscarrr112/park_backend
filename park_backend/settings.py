@@ -167,4 +167,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 default_icon = 'media/icon/timg.jpeg'
 default_md5 = hashlib.md5(np.array(Image.open(default_icon)))
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = [
+   'http://localhost',
+]
