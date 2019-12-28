@@ -55,8 +55,8 @@ class ListView(View, CommonResponseMixin):
 
         latitude = float(request.GET.get('latitude'))
         longitude = float(request.GET.get('longitude'))
-        mode = int(request.GET.get('mode'))
-        order_mode = int(request.GET.get('order_mode'))
+        mode = request.GET.get('mode')
+        order_mode = request.GET.get('order_mode')
         bindex = request.GET.get('bindex')
         eindex = request.GET.get('eindex')
 
@@ -75,7 +75,7 @@ class ListView(View, CommonResponseMixin):
 
         if mode == 1:
             park_lots.order_by('price')
-
+            print('mode==1')
             response = []
             for park_lot in park_lots:
                 description_pics = DescriptionPic.objects.filter(park_lot=park_lot)
