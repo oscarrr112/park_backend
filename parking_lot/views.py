@@ -73,6 +73,7 @@ class ListView(View, CommonResponseMixin):
         park_lots = ParkLot.objects.filter(latitude__gte=min_latitude, latitude__lte=max_latitude,
                                            longitude__gte=min_longitude, longitude__lte=max_longitude)
 
+        print(mode)
         if mode == 1:
             park_lots.order_by('price')
             print('mode==1')
