@@ -70,7 +70,7 @@ class ListView(View, CommonResponseMixin):
                                            longitude__gte=min_longitude, longitude__lte=max_longitude)
 
         if mode == 1:
-            park_lots.order_by('price')
+            park_lots = park_lots.order_by('price')
             response = []
             for park_lot in park_lots:
                 description_pics = DescriptionPic.objects.filter(park_lot=park_lot)
@@ -128,7 +128,7 @@ class ListView(View, CommonResponseMixin):
                 }
                 response.append(data)
 
-            sorted(response, key=lambda x: x['price'])
+            sorted(response, key=lambda x: x['distance'])
             response = response[bindex: eindex + 1]
             if order_mode == 2:
                 response.reverse()
