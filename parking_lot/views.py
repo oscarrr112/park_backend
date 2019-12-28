@@ -131,9 +131,7 @@ class ListView(View, CommonResponseMixin):
             if order_mode == 2:
                 reversed(response)
             response = ListView.wrap_json_response(data=response, code=ReturnCode.SUCCESS)
-            response=JsonResponse(data=response, safe=False)
-            response['Access-Control-Allow-Origin'] = '*'
-            return response
+            return JsonResponse(data=response, safe=False)
 
 
 class UserList(View, CommonResponseMixin):
