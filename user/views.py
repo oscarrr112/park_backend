@@ -40,7 +40,11 @@ class AuthorizeView(View, CommonResponseMixin):
             response = self.wrap_json_response(code=ReturnCode.BROKEN_PARAMS)
             return JsonResponse(data=response, safe=False)
 
-        user = User.objects.get(phone_number=phone_number)
+        try:
+            user = User.objects.get(phone_number=phone_number)
+        except User.DoesNotExist:
+            response = AuthorizeView.wrap_json_response(code=ReturnCode.UNREGISTERED)
+            return JsonResponse(data=response, safe=False)
 
         if user is None:
             response = AuthorizeView.wrap_json_response(code=ReturnCode.UNREGISTERED)
