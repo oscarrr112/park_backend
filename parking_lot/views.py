@@ -9,6 +9,7 @@ from utils import auth, geometry
 
 import json
 
+
 # Create your views here.
 
 
@@ -53,34 +54,27 @@ class ListView(View, CommonResponseMixin):
 
         distance = 5000
 
-        latitude = float(request.GET.get('latitude'))
-        longitude = float(request.GET.get('longitude'))
-        mode = request.GET.get('mode')
-        order_mode = request.GET.get('order_mode')
-        bindex = request.GET.get('bindex')
-        eindex = request.GET.get('eindex')
-
-        if not all([latitude, longitude, mode]) and (
-                mode == 0 and not all([bindex, eindex])) or mode == 1 or order_mode is None:
-            response = ListView.wrap_json_response(code=ReturnCode.BROKEN_PARAMS)
+        try:
+            latitude = float(request.GET.get('latitude'))
+            longitude = float(request.GET.get('longitude'))
+            mode = int(request.GET.get('mode'))
+            order_mode = int(request.GET.get('order_mode'))
+            bindex = int(request.GET.get('bindex'))
+            eindex = int(request.GET.get('eindex'))
+        except TypeError:
+            response = self.wrap_json_response(code=ReturnCode.BROKEN_PARAMS)
             return JsonResponse(data=response, safe=False)
-
-        if mode == 0:
-            bindex = int(bindex)
-            eindex = int(eindex)
 
         max_latitude, min_latitude, min_longitude, max_longitude = geometry.delta(latitude, longitude, distance)
         park_lots = ParkLot.objects.filter(latitude__gte=min_latitude, latitude__lte=max_latitude,
                                            longitude__gte=min_longitude, longitude__lte=max_longitude)
 
-        print(mode)
         if mode == 1:
             park_lots.order_by('price')
-            print('mode==1')
             response = []
             for park_lot in park_lots:
                 description_pics = DescriptionPic.objects.filter(park_lot=park_lot)
-                response += {
+                response.append({
                     'park_lot_id': park_lot.park_lot_id,
                     'renter': park_lot.renter.phone_number,
                     'renter_nickname': park_lot.renter.nickname,
@@ -94,7 +88,7 @@ class ListView(View, CommonResponseMixin):
                     'remark': park_lot.remark,
                     'distance': geometry.get_distance_hav(park_lot.latitude, park_lot.longitude, latitude, longitude),
                     'photo_url': ['http://114.55.255.62:8000' + pic.pic.url for pic in description_pics],
-                }
+                })
                 if order_mode == 2:
                     response = reversed(response)
             response = ListView.wrap_json_response(data=response, code=ReturnCode.SUCCESS)
