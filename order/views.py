@@ -297,7 +297,7 @@ class ParkLotListView(View, CommonResponseMixin):
                 'tenant_nickname': order.tenant.nickname,
                 'park_lot': order.park_lot_id,
                 'state': order.state,
-                'image_url': [pic.pic.url for pic in pics],
+                'image_url': ['http://114.55.255.62:8000' + pic.pic.url for pic in pics],
                 'tot_price': order.tot_price
             }
             response.append(data)

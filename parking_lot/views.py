@@ -92,8 +92,7 @@ class ListView(View, CommonResponseMixin):
                     'rent_state': park_lot.rent_state,
                     'remark': park_lot.remark,
                     'distance': geometry.get_distance_hav(park_lot.latitude, park_lot.longitude, latitude, longitude),
-                    'icon_url': park_lot.renter.icon.url,
-                    'photo_url': [pic.pic.url for pic in description_pics],
+                    'photo_url': ['http://114.55.255.62:8000' + pic.pic.url for pic in description_pics],
                 }
                 if order_mode == 2:
                     response = reversed(response)
@@ -123,9 +122,8 @@ class ListView(View, CommonResponseMixin):
                     'rent_state': park_lot.rent_state,
                     'remark': park_lot.remark,
                     'distance': geometry.get_distance_hav(park_lot.latitude, park_lot.longitude, latitude, longitude),
-                    'photo_url': [pic.pic.url for pic in description_pics],
+                    'photo_url': ['http://114.55.255.62:8000' + pic.pic.url for pic in description_pics],
                     'nickname': park_lot.renter.nickname,
-                    'icon_url': park_lot.renter.icon.url
                 }
                 response.append(data)
 
@@ -158,7 +156,7 @@ class UserList(View, CommonResponseMixin):
                 'park_lot_id': park_lot.park_lot_id,
                 'detail_address': park_lot.detail_address,
                 'rent_state': park_lot.rent_state,
-                'photo_url': [pic.pic.url for pic in description_pics]
+                'photo_url': ['http://114.55.255.62:8000' + pic.pic.url for pic in description_pics],
             }
             response.append(data)
 
@@ -276,7 +274,7 @@ class GetInfoView(View, CommonResponseMixin):
             'price': park_lot.price,
             'remark': park_lot.remark,
             'detail_word': park_lot.detail_word,
-            'photo_url': [pic.pic.url for pic in description_pics],
+            'photo_url': ['http://114.55.255.62:8000' + pic.pic.url for pic in description_pics],
             'rent_state': park_lot.rent_state
         }
 
