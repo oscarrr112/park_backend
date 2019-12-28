@@ -163,9 +163,9 @@ default_md5 = hashlib.md5(np.array(Image.open(default_icon)))
 # CORS_ORIGIN_ALLOW_ALL = True
 # CORS 设置跨域域名
 CORS_ORIGIN_WHITELIST = (
-    '127.0.0.1:8000',
-    'localhost:8000',
-    '114.55.255.62:8000'
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+    'http://114.55.255.62:8000'
 )
 
 CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
