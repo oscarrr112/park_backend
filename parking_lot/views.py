@@ -55,8 +55,8 @@ class ListView(View, CommonResponseMixin):
 
         latitude = float(request.GET.get('latitude'))
         longitude = float(request.GET.get('longitude'))
-        mode = request.GET.get('mode')
-        order_mode = request.GET.get('order_mode')
+        mode = int(request.GET.get('mode'))
+        order_mode = int(request.GET.get('order_mode'))
         bindex = request.GET.get('bindex')
         eindex = request.GET.get('eindex')
 
