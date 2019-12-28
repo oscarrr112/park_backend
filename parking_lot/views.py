@@ -51,7 +51,6 @@ class ListView(View, CommonResponseMixin):
 
         distance = 5000
 
-        print(request.GET.get('latitude'))
         latitude = float(request.GET.get('latitude'))
         longitude = float(request.GET.get('longitude'))
         mode = request.GET.get('mode')
