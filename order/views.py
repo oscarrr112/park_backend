@@ -40,7 +40,10 @@ class NewList(View, CommonResponseMixin):
             return JsonResponse(data=response, safe=False)
 
         if tenant.state:
-            response = self.wrap_json_response(code=ReturnCode.ORDER_NOT_PAID)
+            data = {
+                'order_id': Order.objects.get(tenant=tenant, state__in=[0, 1, 2]).order_id
+            }
+            response = self.wrap_json_response(code=ReturnCode.ORDER_NOT_PAID, data=data)
             return JsonResponse(data=response, safe=False)
 
         if park_lot.rent_state:

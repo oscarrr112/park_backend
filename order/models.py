@@ -8,6 +8,8 @@ from parking_lot.models import ParkLot
 class Order(models.Model):
     """
     state: 订单状态 -1:已取消 0:预约中 1:进行中 2:未支付 3:已支付
+    lessor 车位出租者
+    tenant 租车位者
     """
     order_id = models.AutoField(primary_key=True)
     time_start = models.DateTimeField(blank=True, null=True)
