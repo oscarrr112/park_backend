@@ -57,8 +57,8 @@ class ListView(View, CommonResponseMixin):
         longitude = float(request.GET.get('longitude'))
         mode = request.GET.get('mode')
         order_mode = request.GET.get('order_mode')
-        bindex = int(request.GET.get('bindex'))
-        eindex = int(request.GET.get('eindex'))
+        bindex = request.GET.get('bindex')
+        eindex = request.GET.get('eindex')
 
         if not all([latitude, longitude, mode]) and (
                 mode == 0 and not all([bindex, eindex])) or mode == 1 or order_mode is None:
