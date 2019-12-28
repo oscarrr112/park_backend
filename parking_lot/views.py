@@ -47,8 +47,6 @@ class NewView(View, CommonResponseMixin):
 
 class ListView(View, CommonResponseMixin):
 
-    @auth.login_required
-    @auth.id_cert_required
     def get(self, request):
 
         distance = 5000
