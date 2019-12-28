@@ -89,8 +89,9 @@ class ListView(View, CommonResponseMixin):
                     'distance': geometry.get_distance_hav(park_lot.latitude, park_lot.longitude, latitude, longitude),
                     'photo_url': ['http://114.55.255.62:8000' + pic.pic.url for pic in description_pics],
                 })
-                if order_mode == 2:
-                    response = reversed(response)
+
+            if order_mode == 2:
+                response.reverse()
             response = ListView.wrap_json_response(data=response, code=ReturnCode.SUCCESS)
             return JsonResponse(data=response, safe=False)
         else:
@@ -130,7 +131,7 @@ class ListView(View, CommonResponseMixin):
             sorted(response, key=lambda x: x['distance'])
             response = response[bindex: eindex + 1]
             if order_mode == 2:
-                reversed(response)
+                response.reverse()
             response = ListView.wrap_json_response(data=response, code=ReturnCode.SUCCESS)
             return JsonResponse(data=response, safe=False)
 
