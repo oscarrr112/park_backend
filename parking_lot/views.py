@@ -7,6 +7,7 @@ from user.models import User
 from utils.respones import CommonResponseMixin, ReturnCode
 from utils import auth, geometry
 
+import json
 
 # Create your views here.
 
@@ -27,6 +28,7 @@ class NewView(View, CommonResponseMixin):
 
         renter_id = request.session.get('phone_number')
 
+        rent_date = json.dumps(rent_date)
         if not all([longitude, latitude, detail_address, rent_date, price, photos, rent_state]):
             response = NewView.wrap_json_response(code=ReturnCode.BROKEN_PARAMS)
             return JsonResponse(data=response, safe=False)
@@ -84,7 +86,7 @@ class ListView(View, CommonResponseMixin):
                     'longitude': park_lot.longitude,
                     'latitude': park_lot.latitude,
                     'detail_address': park_lot.detail_address,
-                    'rent_date': park_lot.rent_date,
+                    'rent_date': json.loads(park_lot.rent_date),
                     'price': park_lot.price,
                     'detail_word': park_lot.detail_word,
                     'rent_state': park_lot.rent_state,
@@ -115,7 +117,7 @@ class ListView(View, CommonResponseMixin):
                     'longitude': park_lot.longitude,
                     'latitude': park_lot.latitude,
                     'detail_address': park_lot.detail_address,
-                    'rent_date': park_lot.rent_date,
+                    'rent_date': json.loads(park_lot.rent_date),
                     'price': park_lot.price,
                     'detail_word': park_lot.detail_word,
                     'rent_state': park_lot.rent_state,
@@ -270,7 +272,7 @@ class GetInfoView(View, CommonResponseMixin):
             'longitude': park_lot.longitude,
             'latitude': park_lot.latitude,
             'detail_address': park_lot.detail_address,
-            'rent_date': park_lot.rent_date,
+            'rent_date': json.loads(park_lot.rent_date),
             'price': park_lot.price,
             'remark': park_lot.remark,
             'detail_word': park_lot.detail_word,
