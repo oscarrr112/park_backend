@@ -16,5 +16,5 @@ urlpatterns = [
     path('del', views.DelList.as_view()),
     path('odify', views.ModifyList.as_view()),
     path('getinfo', views.GetInfoView.as_view()),
-    path('newpic', views.NewPicView.as_view())
+    path('newpic', views.NewPicView.as_view()),
 ]

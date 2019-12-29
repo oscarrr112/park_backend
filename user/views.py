@@ -249,3 +249,24 @@ class NewIconView(View, CommonResponseMixin):
 
         response = self.wrap_json_response(code=ReturnCode.SUCCESS)
         return JsonResponse(data=response, safe=False)
+
+
+class LogoutView(View, CommonResponseMixin):
+
+    @auth.login_required
+    def post(self, request):
+        phone_number = request.POST.get('phone_number')
+
+        if phone_number is None:
+            response = self.wrap_json_response(code=ReturnCode.BROKEN_PARAMS)
+            return JsonResponse(data=response, safe=False)
+
+        if phone_number != request.session.get('phone_number'):
+            response = self.wrap_json_response(code=ReturnCode.PHONE_NUMBER_NOT_THE_SAME)
+            return JsonResponse(data=response)
+
+        del request.session['phone_number']
+        del request.session['is_authorized']
+
+        response = self.wrap_json_response(code=ReturnCode.SUCCESS)
+        return JsonResponse(data=response, safe=False)

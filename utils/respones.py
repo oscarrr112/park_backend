@@ -41,6 +41,9 @@ class ReturnCode:
     # 注册账号状态码
     PHONE_NUMBER_NOT_EXISTED = 215
 
+    # 注销账号状态码
+    PHONE_NUMBER_NOT_THE_SAME = 216
+
     # 获取车位列表状态码
     BAD_INDEX = 301
 
@@ -87,7 +90,10 @@ messages[ReturnCode.WRONG_CARD_NUMBER] = '银行卡号错误'
 messages[ReturnCode.NO_BANK_ACCOUNT] = '无银行卡账号绑定'
 
 # 注册状态信息
-messages[ReturnCode.PHONE_NUMBER_NOT_EXISTED] = '手机号已存在'
+messages[ReturnCode.PHONE_NUMBER_NOT_EXISTED] = '手机号未存在'
+
+# 注销账号状态码
+messages[ReturnCode.PHONE_NUMBER_NOT_THE_SAME] = '手机账号匹配失败'
 
 # 获取车位列表状态信息
 messages[ReturnCode.BAD_INDEX] = '索引越界'
