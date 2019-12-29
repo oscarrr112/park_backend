@@ -123,9 +123,11 @@ class ListView(View, CommonResponseMixin):
             return JsonResponse(data=response, safe=False)
         else:
 
-            if bindex < 0 or eindex >= ParkLot.objects.count():
+            if bindex < 0 or bindex >= ParkLot.objects.count():
                 response = ListView.wrap_json_response(code=ReturnCode.BAD_INDEX)
                 return JsonResponse(data=response, safe=False)
+
+            eindex = eindex if eindex < ParkLot.objects.count() else ParkLot.objects.count() - 1
 
             tmp = 1
             while park_lots.count() < eindex:
