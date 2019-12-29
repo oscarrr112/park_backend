@@ -170,7 +170,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 #     'http://117.172.229.11:8000'
 # )
 
-CORS_ALLOW_CREDENTIALS = False  # 允许携带cookie
+CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
 
 # 前端需要携带cookies访问后端时,需要设置
 # withCredentials: true
