@@ -22,7 +22,6 @@ class NewView(View, CommonResponseMixin):
         latitude = request.POST.get('latitude')
         detail_address = request.POST.get('detail_address')
         rent_date = request.POST.get('rent_date')
-        photos = request.FILES
         rent_state = request.POST.get('rent_state')
         remark = request.POST.get('remark')
         price = request.POST.get('price')
@@ -30,7 +29,7 @@ class NewView(View, CommonResponseMixin):
         renter_id = request.session.get('phone_number')
 
         rent_date = json.dumps(rent_date)
-        if not all([longitude, latitude, detail_address, rent_date, price, photos, rent_state]):
+        if not all([longitude, latitude, detail_address, rent_date, price, rent_state]):
             response = NewView.wrap_json_response(code=ReturnCode.BROKEN_PARAMS)
             return JsonResponse(data=response, safe=False)
 
@@ -40,11 +39,39 @@ class NewView(View, CommonResponseMixin):
                            remark=remark, price=price)
         park_lot.save()
 
-        for photo_name in photos:
-            photo_db = DescriptionPic(pic=request.FILES.get(photo_name), park_lot=park_lot)
-            photo_db.save()
+        response = NewView.wrap_json_response(code=ReturnCode.SUCCESS, data={
+            'parking_lot_id': park_lot.park_lot_id
+        })
+        return JsonResponse(data=response, safe=False)
 
-        response = NewView.wrap_json_response(code=ReturnCode.SUCCESS)
+
+class NewPicView(View, CommonResponseMixin):
+
+    @auth.login_required
+    @auth.id_cert_required
+    def post(self, request):
+        park_lot_id = request.POST.get('parking_lot_id')
+        pics = request.FILES
+
+        if not all([park_lot_id, pics]):
+            response = self.wrap_json_response(code=ReturnCode.BROKEN_PARAMS)
+            return JsonResponse(data=response, safe=False)
+
+        try:
+            park_lot = ParkLot.objects.get(park_lot_id=park_lot_id)
+        except ParkLot.DoesNotExist:
+            response = self.wrap_json_response(code=ReturnCode.INVALID_PARK_LOT)
+            return JsonResponse(data=response, safe=False)
+
+        des_pics = DescriptionPic.objects.filter(park_lot=park_lot)
+        for pic in des_pics:
+            pic.delete()
+
+        for key, value in pics.items():
+            pic = DescriptionPic(pic=value, park_lot=park_lot)
+            pic.save()
+
+        response = self.wrap_json_response(code=ReturnCode.SUCCESS)
         return JsonResponse(data=response, safe=False)
 
 
@@ -194,7 +221,6 @@ class ModifyList(View, CommonResponseMixin):
         parking_lot_id = request.POST.get('parking_lot_id')
         rent_date = request.POST.get('rent_date')
         description_tag = request.POST.get('description_tag')
-        photos = request.FILES
         rent_state = request.POST.get('rent_state')
         remark = request.POST.get('remark')
         price = request.POST.get('price')
@@ -215,15 +241,6 @@ class ModifyList(View, CommonResponseMixin):
         if park_lot is None:
             response = self.wrap_json_response(code=ReturnCode.INVALID_PARK_LOT)
             return JsonResponse(data=response, safe=False)
-
-        if photos is not None:
-            photo_descriptions = DescriptionPic.objects.filter(park_lot_id=parking_lot_id)
-            for photo in photo_descriptions:
-                photo.delete()
-
-            for photo_name in photos:
-                photo_db = DescriptionPic(pic=request.FILES.get(photo_name), park_lot=park_lot)
-                photo_db.save()
 
         park_lot.rent_date = rent_date if rent_date is not None else park_lot.rent_date
         park_lot.description_tag = description_tag if description_tag is not None else park_lot.description_tag

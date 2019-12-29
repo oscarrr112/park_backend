@@ -62,11 +62,11 @@ class AuthorizeView(View, CommonResponseMixin):
                 'ID': user.ID,
                 'sex': '男' if user.sex == 1 else '女',
                 'bankcard': user.bankcard,
-                'icon_url': user.icon.url if user.icon.url != '/media/' + settings.default_icon else settings.default_icon,
+                'icon_url': user.icon.url if user.icon.url != '/media/' + settings.default_icon
+                else '/' + settings.default_icon,
                 'state': user.state,
             }
 
-            print('/media/' + settings.default_icon)
 
             response = AuthorizeView.wrap_json_response(data=response)
             return JsonResponse(data=response, safe=False)
@@ -129,7 +129,6 @@ class RegisterView(View, CommonResponseMixin):
 
         nickname = request.POST.get('petname')
         phone_number = request.POST.get('phone_number')
-        icon = request.FILES.get('icon')
         password = request.POST.get('password')
         sex = request.POST.get('sex')
 
@@ -138,14 +137,7 @@ class RegisterView(View, CommonResponseMixin):
             response = RegisterView.wrap_json_response(code=ReturnCode.BROKEN_PARAMS)
             return JsonResponse(data=response, safe=False)
 
-        user = User.objects.filter(phone_number=phone_number)
-        if user.count() != 0:
-            response = self.wrap_json_response(code=ReturnCode.PHONE_NUMBER_NOT_EXISTED)
-            return JsonResponse(data=response, safe=False)
-
         user = User(phone_number=phone_number, password=password, nickname=nickname, sex=1 if sex == "男" else 0)
-        if icon is not None:
-            user.icon = icon
 
         user.save()
 
@@ -220,9 +212,40 @@ class GetInfoView(View, CommonResponseMixin):
             'ID': user.ID,
             'sex': '男' if user.sex == 1 else '女',
             'bankcard': user.bankcard,
-            'icon_url': user.icon.url if user.icon.url != '/media/' + settings.default_icon else settings.default_icon,
+            'icon_url': user.icon.url if user.icon.url != '/media/' + settings.default_icon
+            else '/' + settings.default_icon,
             'state': user.state,
         }
 
         response = AuthorizeView.wrap_json_response(data=response)
+        return JsonResponse(data=response, safe=False)
+
+
+class NewIconView(View, CommonResponseMixin):
+
+    def post(self, request):
+        icon = request.FILES.get('icon')
+        phone_number = request.POST.get('phone_number')
+
+        if not all([icon, phone_number]):
+            response = self.wrap_json_response(code=ReturnCode.BROKEN_PARAMS)
+            return JsonResponse(data=response, safe=False)
+
+        try:
+            user = User.objects.get(phone_number=phone_number)
+        except User.DoesNotExist:
+            response = self.wrap_json_response(code=ReturnCode.PHONE_NUMBER_NOT_EXISTED)
+            return JsonResponse(data=response, safe=False)
+
+        icon_md5 = hashlib.md5(np.array(icon))
+        user_icon_md5 = hashlib.md5(np.array(user.icon))
+        if user_icon_md5 != icon_md5 and user_icon_md5 != settings.default_md5:
+            user.icon.storage.delete(user.icon.path)
+            user.icon = icon
+        elif user_icon_md5 == settings.default_md5:
+            user.icon = icon
+
+        user.save()
+
+        response = self.wrap_json_response(code=ReturnCode.SUCCESS)
         return JsonResponse(data=response, safe=False)
