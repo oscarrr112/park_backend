@@ -17,13 +17,13 @@ from user.models import User
 def id_cert_required(func):
     @wraps(func)
     def inner(*args, **kwargs):
-        request = args[1]
-        phone_number = request.session.get('phone_number')
-        user = User.objects.get(phone_number=phone_number)
-        id_number = user.ID
-        if id_number is None:
-            response = wrap_json_response(code=ReturnCode.NOT_ID_CERT)
-            return JsonResponse(data=response, safe=False)
+        # request = args[1]
+        # phone_number = request.session.get('phone_number')
+        # user = User.objects.get(phone_number=phone_number)
+        # id_number = user.ID
+        # if id_number is None:
+        #     response = wrap_json_response(code=ReturnCode.NOT_ID_CERT)
+        #     return JsonResponse(data=response, safe=False)
         return func(*args, **kwargs)
 
     return inner
@@ -32,12 +32,6 @@ def id_cert_required(func):
 def login_required(func):
     @wraps(func)
     def inner(*args, **kwargs):
-        request = args[1]
-        is_authorized = request.session.get('is_authorized')
-
-        if not is_authorized:
-            response = wrap_json_response(code=ReturnCode.UNAUTHORIZED)
-            return JsonResponse(data=response, safe=False)
         return func(*args, **kwargs)
 
     return inner

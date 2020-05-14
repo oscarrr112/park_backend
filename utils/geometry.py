@@ -8,8 +8,13 @@
 
 
 from math import sin, asin, cos, radians, fabs, sqrt, degrees
+import logging
+
+logger = logging.getLogger(__file__)
+
 
 EARTH_RADIUS = 6371  # 地球平均半径，6371km
+
 
 
 def hav(theta):
@@ -34,7 +39,12 @@ def get_distance_hav(lat0, lng0, lat1, lng1):
 
 
 def delta(lat, lng, distance):
-    dlng = 2 * asin(sin(distance / (2 * EARTH_RADIUS)) / cos(lat))
+    a = (sin(distance / (2 * EARTH_RADIUS)) / cos(lat))
+    if a > 1.0:
+        a = 0.99
+    elif a < -1.0:
+        a = -0.99
+    dlng = 2 * asin(a)
     dlng = degrees(dlng)  # 弧度转换成角度
 
     dlat = distance / EARTH_RADIUS

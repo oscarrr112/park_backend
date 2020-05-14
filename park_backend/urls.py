@@ -20,8 +20,11 @@ from django.views.static import serve
 
 from park_backend import settings
 
+from utils.log import LogView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('park_backend.version_1_0')),
-    re_path('^media/(?P<path>.*)', serve, {'document_root': settings.MEDIA_ROOT})
+    re_path('^media/(?P<path>.*)', serve, {'document_root': settings.MEDIA_ROOT}),
+    path('api/v1/log', LogView.as_view())
 ]

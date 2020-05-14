@@ -15,7 +15,5 @@ urlpatterns = [
     path('idcert', views.IDCertificationView.as_view()),
     path('usermanagement', views.UserManageView.as_view()),
     path('icon', views.IconView.as_view()),
-    path('getinfo', views.GetInfoView.as_view()),
     path('newicon', views.NewIconView.as_view()),
-    path('logout', views.LogoutView.as_view())
 ]

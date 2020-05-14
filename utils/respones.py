@@ -40,6 +40,7 @@ class ReturnCode:
 
     # 注册账号状态码
     PHONE_NUMBER_NOT_EXISTED = 215
+    PHONE_NUMBER_EXISTED = 217
 
     # 注销账号状态码
     PHONE_NUMBER_NOT_THE_SAME = 216
@@ -91,6 +92,7 @@ messages[ReturnCode.NO_BANK_ACCOUNT] = '无银行卡账号绑定'
 
 # 注册状态信息
 messages[ReturnCode.PHONE_NUMBER_NOT_EXISTED] = '手机号未存在'
+messages[ReturnCode.PHONE_NUMBER_EXISTED] = '手机号已存在'
 
 # 注销账号状态码
 messages[ReturnCode.PHONE_NUMBER_NOT_THE_SAME] = '手机账号匹配失败'

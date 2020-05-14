@@ -19,5 +19,5 @@ urlpatterns = [
     path('cancel', views.CancelView.as_view()),
     path('lessor', views.LessorListView.as_view()),
     path('tenant', views.TenantListView.as_view()),
-    path('park_lot', views.ParkLotListView.as_view())
+    path('park-lot', views.ParkLotListView.as_view())
 ]
