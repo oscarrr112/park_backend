@@ -300,6 +300,7 @@ class TenantListView(View, CommonResponseMixin):
             response = self.wrap_json_response(code=ReturnCode.INVALID_ORDER_ID)
             return JsonResponse(data=response, safe=False)
 
+        pics = DescriptionPic.objects.filter(park_lot=order.park_lot)
         data = {
             'order_id': order.order_id,
             'time_start': order.time_start.strftime('%Y-%m-%d %H:%M') if order.time_start is not None else None,
@@ -313,6 +314,7 @@ class TenantListView(View, CommonResponseMixin):
             'tenant_nickname': order.tenant.nickname,
             'park_lot': order.park_lot_id,
             'state': order.state,
+            'photo_urls': [image_url(pic.pic.url) for pic in pics],
             'tot_price': order.tot_price
         }
 
