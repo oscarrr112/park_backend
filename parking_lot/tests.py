@@ -145,8 +145,11 @@ class ListTest(TestCase):
         response = self.client.get(self.url, data=data)
         response = json.loads(response.content)
         self.assertEqual(response.get('code'), ReturnCode.SUCCESS, '获取列表距离优先降序: 状态码错误')
-        self.assertEqual(sorted(response.get('data'), key=lambda x: x['price']), response.get('data'),
-                         '获取列表距离优先降序: 错误')
+        data = response['data']
+        for i in range(0, len(data) - 1):
+            self.assertGreaterEqual(data[i]['price'], data[i + 1]['price'], '获取列表距离优先降序: 错误')
+        # self.assertEqual(sorted(response.get('data'), key=lambda x: x['price']), response.get('data'),
+        #                  )
 
     def test_list_base_mode_1_order_mode_2(self):
         longitude = random.uniform(0, 90)
@@ -164,8 +167,9 @@ class ListTest(TestCase):
         response = self.client.get(self.url, data=data)
         response = json.loads(response.content)
         self.assertEqual(response.get('code'), ReturnCode.SUCCESS, '获取列表距离优先升序: 状态码错误')
-        self.assertEqual(sorted(response.get('data'), key=lambda x: x['price']), response.get('data'),
-                         '获取列表距离优先升序: 错误')
+        data = response.get('data')
+        for i in range(0, len(data) - 1):
+            self.assertLessEqual(data[i]['price'], data[i + 1]['price'], '获取列表距离优先降序: 错误')
 
 
 class DelTest(TestCase):

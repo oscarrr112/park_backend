@@ -97,11 +97,16 @@ class ListView(View, CommonResponseMixin):
             longitude = float(request.GET.get('longitude'))
             mode = int(request.GET.get('mode'))
             order_mode = int(request.GET.get('order_mode'))
-            bindex = int(request.GET.get('bindex'))
-            eindex = int(request.GET.get('eindex'))
         except TypeError:
             response = self.wrap_json_response(code=ReturnCode.BROKEN_PARAMS)
             return JsonResponse(data=response, safe=False)
+
+        try:
+            bindex = int(request.GET.get('bindex'))
+            eindex = int(request.GET.get('eindex'))
+        except TypeError:
+            bindex = 0
+            eindex = 50
 
         # 获取最大、最小经纬度的范围
         max_latitude, min_latitude, min_longitude, max_longitude = geometry.delta(latitude, longitude, distance)
@@ -141,7 +146,6 @@ class ListView(View, CommonResponseMixin):
             if bindex < 0 or bindex >= ParkLot.objects.count() or bindex > eindex:
                 response = ListView.wrap_json_response(code=ReturnCode.BAD_INDEX)
                 return JsonResponse(data=response, safe=False)
-
             # 将eindex合法化
             eindex = eindex if eindex < ParkLot.objects.count() else ParkLot.objects.count() - 1
 
@@ -226,12 +230,10 @@ class DelView(View, CommonResponseMixin):
             return JsonResponse(data=response, safe=False)
 
         try:
-            parking_lot = ParkLot.objects.get(park_lot_id=parking_lot_id)
+            ParkLot.objects.filter(park_lot_id=parking_lot_id).delete()
         except Exception:
             response = self.wrap_json_response(code=ReturnCode.INVALID_PARK_LOT)
             return JsonResponse(data=response, safe=False)
-
-        parking_lot.delete()
 
         response = self.wrap_json_response(code=ReturnCode.SUCCESS)
         return JsonResponse(data=response)
