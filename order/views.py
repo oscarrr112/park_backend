@@ -76,7 +76,7 @@ class NewList(View, CommonResponseMixin):
             datetime_end = available_time['datetime_end'].split(':')
             datetime_end = datetime(time_end.year, time_end.month, time_end.day,
                                     int(datetime_end[0]), int(datetime_end[1]))
-            frequency = available_time['frequency']
+            frequency = available_time['frequent']
             if time_start.weekday() + 1 in frequency and datetime_start <= time_start and time_end <= datetime_end:
                 available = True
                 break
