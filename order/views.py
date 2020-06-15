@@ -223,8 +223,8 @@ class CancelView(View, CommonResponseMixin):
         tenant = User.objects.get(phone_number=order.tenant.phone_number)
 
         time_end = datetime.now()
-        time_start = order.time_start + timedelta(hours=1)
-        if time_end >= time_start:
+        time_start = order.book_time_start - timedelta(hours=1)
+        if time_end <= time_start:
             tenant.state = UserState.available
             order.state = OrderState.canceled
             park_lot = ParkLot.objects.get(park_lot_id=order.park_lot.park_lot_id)
@@ -278,8 +278,10 @@ class LessorListView(View, CommonResponseMixin):
 
         if mode == 4:
             orders = Order.objects.filter(tenant=tenant)
-        else:
+        elif mode != 2:
             orders = Order.objects.filter(tenant=tenant, state=mode)
+        else:
+            orders = Order.objects.filter(tenant=tenant, state=mode) | Order.objects.filter(tenant=tenant, state=-mode)
 
         response = []
         for order in orders:
