@@ -35,6 +35,6 @@ class DescriptionPic(models.Model):
     pic 图片
     park_lot 对应的车位
     """
-    pic_id = models.IntegerField(primary_key=True)
+    pic_id = models.AutoField(primary_key=True)
     pic = models.ImageField(upload_to='park_pic')
     park_lot = models.ForeignKey(ParkLot, on_delete=models.CASCADE)
