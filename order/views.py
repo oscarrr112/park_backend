@@ -93,8 +93,8 @@ class NewList(View, CommonResponseMixin):
         # 新建Order记录
         Order.objects.create(book_time_start=time_start, book_time_end=time_end, price=park_lot.price,
                              park_lot=park_lot, tenant=tenant, lessor=lessor)
-        park_lot.rent_state = 1
-        tenant.state = 1
+        park_lot.rent_state = ParkLotState.booked
+        tenant.state = UserState.booked
         print(tenant.phone_number, tenant.state)
         response = self.wrap_json_response(code=ReturnCode.SUCCESS)
         print('SUCCESS')
@@ -118,10 +118,10 @@ class BeginView(View, CommonResponseMixin):
             response = self.wrap_json_response(code=ReturnCode.INVALID_ORDER_ID)
             return JsonResponse(data=response, safe=False)
 
-        order.state = 1
+        order.state = OrderState.going
 
         park_lot = ParkLot.objects.get(park_lot_id=order.park_lot.park_lot_id)
-        park_lot.rent_state = 2
+        park_lot.rent_state = ParkLotState.used
         order.time_start = datetime.now()
         response = self.wrap_json_response(data={
             'time_start': order.time_start.strftime('%Y-%m-%d %H:%M')
@@ -141,19 +141,19 @@ class EndView(View, CommonResponseMixin):
 
         order = Order.objects.get(order_id=order_id)
 
-        if order is None or order.state != 1:
+        if order is None or order.state != OrderState.going:
             response = self.wrap_json_response(code=ReturnCode.INVALID_ORDER_ID)
             return JsonResponse(data=response, safe=False)
 
-        order.state = 2
+        order.state = OrderState.not_payed
         order.time_end = datetime.now()
         time_start = order.time_start
         time_end = order.time_end
         delta_time = time_end - time_start
-        order.tot_price = order.price * ceil(delta_time.seconds / (60 * 60))
+        order.tot_price = order.price * delta_time.seconds / (60 * 60)
 
         tenant = User.objects.get(phone_number=order.tenant.phone_number)
-        tenant.state = 2
+        tenant.state = UserState.not_payed
 
         park_lot = ParkLot.objects.get(park_lot_id=order.park_lot.park_lot_id)
         park_lot.rent_state = 0
@@ -180,14 +180,14 @@ class PayView(View, CommonResponseMixin):
 
         order = Order.objects.get(order_id=order_id)
 
-        if order is None or order.state != 2:
+        if order is None or abs(order.state) != 2:
             response = self.wrap_json_response(code=ReturnCode.INVALID_ORDER_ID)
             return JsonResponse(data=response, safe=False)
 
-        order.state = 3
+        order.state = OrderState.canceled if order.state == OrderState.canceled_not_pay else OrderState.payed
 
         tenant = order.tenant
-        tenant.state = 0
+        tenant.state = UserState.available
         data = {
             'tot_price': order.tot_price,
             'time_start': order.time_start,
@@ -221,18 +221,37 @@ class CancelView(View, CommonResponseMixin):
             return JsonResponse(data=response, safe=False)
 
         tenant = User.objects.get(phone_number=order.tenant.phone_number)
-        tenant.state = UserState.available
 
-        order.state = OrderState.canceled
+        time_end = datetime.now()
+        time_start = order.time_start + timedelta(hours=1)
+        if time_end >= time_start:
+            tenant.state = UserState.available
+            order.state = OrderState.canceled
+            park_lot = ParkLot.objects.get(park_lot_id=order.park_lot.park_lot_id)
+            park_lot.rent_state = ParkLotState.available
+            order.tot_price = 0
+            order.time_end = time_end
 
-        park_lot = ParkLot.objects.get(park_lot_id=order.park_lot.park_lot_id)
-        park_lot.rent_state = ParkLotState.available
+            tenant.save()
+            order.save()
+            park_lot.save()
+        else:
+            order.state = OrderState.canceled_not_pay
+            park_lot = ParkLot.objects.get(park_lot_id=order.park_lot.park_lot_id)
+            park_lot.rent_state = ParkLotState.available
+            tenant.state = UserState.not_payed
+            order.time_end = time_end
+
+            time_start = order.book_time_start
+            time_end = order.book_time_end
+            delta_time = time_end - time_start
+            order.tot_price = order.price * delta_time.seconds / (60 * 60)
+
+            tenant.save()
+            order.save()
+            park_lot.save()
 
         response = self.wrap_json_response(code=ReturnCode.SUCCESS)
-        tenant.save()
-        order.save()
-        park_lot.save()
-
         return JsonResponse(data=response, safe=False)
 
 
@@ -277,7 +296,7 @@ class LessorListView(View, CommonResponseMixin):
                 'tenant': order.tenant_id,
                 'tenant_nickname': order.tenant.nickname,
                 'park_lot': order.park_lot_id,
-                'state': order.state,
+                'state': abs(order.state) if order.state == OrderState.canceled_not_pay else order.state,
                 'tot_price': order.tot_price,
                 'photo_urls': [image_url(pic.pic.url) for pic in pics],
                 'detail_address': order.park_lot.detail_address
@@ -317,7 +336,7 @@ class TenantListView(View, CommonResponseMixin):
             'tenant': order.tenant_id,
             'tenant_nickname': order.tenant.nickname,
             'park_lot': order.park_lot_id,
-            'state': order.state,
+            'state': abs(order.state) if order.state == OrderState.canceled_not_pay else order.state,
             'photo_urls': [image_url(pic.pic.url) for pic in pics],
             'tot_price': order.tot_price
         }
@@ -348,8 +367,8 @@ class ParkLotListView(View, CommonResponseMixin):
                 'tenant': order.tenant_id,
                 'tenant_nickname': order.tenant.nickname,
                 'park_lot': order.park_lot_id,
-                'state': order.state,
-                'image_url': ['http://114.55.255.62:8000' + pic.pic.url for pic in pics],
+                'state': abs(order.state) if order.state == OrderState.canceled_not_pay else order.state,
+                'image_url': [image_url(pic.pic.url) for pic in pics],
                 'tot_price': order.tot_price
             }
             response.append(data)

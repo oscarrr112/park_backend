@@ -20,7 +20,9 @@ class ParkLotState:
 
 
 class OrderState:
+    canceled_not_pay = -2
     canceled = -1
     booked = 0
-    not_payed = 1
-    payed = 2
+    going = 1
+    not_payed = 2
+    payed = 3
