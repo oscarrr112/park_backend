@@ -182,7 +182,7 @@ CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
 # 前端需要携带cookies访问后端时,需要设置
 # withCredentials: true
 
-server_url = 'http://114.55.255.62:8000/'
+server_url = 'http://114.55.255.62:8000'
 version = '/api/v1'
 
 BASE_LOG_DIR = os.path.join(BASE_DIR, "log")
