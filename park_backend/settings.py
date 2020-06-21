@@ -43,8 +43,6 @@ INSTALLED_APPS = [
     'order',
     'corsheaders',
     'rest_framework',
-    'werkzeug_debugger_runserver',  # 开启https需要的服务
-    'django_extensions',  # 开启https需要的服务
 ]
 
 MIDDLEWARE = [
