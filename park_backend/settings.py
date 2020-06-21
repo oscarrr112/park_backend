@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'order',
     'corsheaders',
     'rest_framework',
+    'werkzeug_debugger_runserver',  # 开启https需要的服务
+    'django_extensions',  # 开启https需要的服务
 ]
 
 MIDDLEWARE = [
@@ -182,7 +184,7 @@ CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
 # 前端需要携带cookies访问后端时,需要设置
 # withCredentials: true
 
-server_url = 'http://114.55.255.62:8000'
+server_url = 'https://easyparking.52pika.cn'
 version = '/api/v1'
 
 BASE_LOG_DIR = os.path.join(BASE_DIR, "log")
